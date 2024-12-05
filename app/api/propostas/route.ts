@@ -4,11 +4,13 @@ import { Cliente } from "../clientes/route"
 export interface Proposta {
   id: number
   cliente: Cliente
-  clienteId: number
+  clienteId: string
   descricao: string
-  resposta: string
+  resposta: string | null
   celular: Celular
   celularId: number
+  createdAt: string
+  updatedAt: string
 }
 
 export async function GET() {

@@ -1,3 +1,4 @@
+import { Foto } from "../fotos/route"
 import { Marca } from "../marcas/route"
 import { Proposta } from "../propostas/route"
 
@@ -6,12 +7,14 @@ export interface Celular {
   modelo: string
   ano: number
   preco: number
-  foto: string
+  foto: string | null
+  fotoId: number | null
+  mainFoto: Foto | null
   createdAt: string
   updatedAt: string
   marca: Marca
   marcaId: number
-  fotos: string[]
+  fotos: Foto[]
   propostas: Proposta[]
 }
 

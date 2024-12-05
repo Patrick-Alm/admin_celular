@@ -48,13 +48,27 @@ export default async function Page() {
               {celulares.map((celular) => (
                 <TableRow key={celular.id}>
                   <TableCell>
-                    {celular.foto ? <Image
-                      src={celular.foto}
-                      alt={celular.modelo}
-                      width={50}
-                      height={50}
-                      className="rounded-md"
-                    /> : <Smartphone size={50} />}
+                    {celular.mainFoto ? (
+                      <Image
+                        src={`data:image/jpeg;base64,${celular.mainFoto.codigoFoto}`}
+                        alt={celular.modelo}
+                        width={50}
+                        height={50}
+                        className="rounded-md object-cover"
+                      />
+                    ) : celular.fotos && celular.fotos.length > 0 ? (
+                      <Image
+                        src={`data:image/jpeg;base64,${celular.fotos[0].codigoFoto}`}
+                        alt={celular.modelo}
+                        width={50}
+                        height={50}
+                        className="rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-[50px] w-[50px] items-center justify-center rounded-md bg-muted">
+                        <Smartphone className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>{celular.modelo}</TableCell>
                   <TableCell>{celular.marca.nome}</TableCell>

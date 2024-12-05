@@ -6,22 +6,74 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useState } from "react"
 import { Marca } from "@/app/api/marcas/route"
+import Image from "next/image"
+import { ImagePlus, Loader2, Upload } from "lucide-react"
 
 export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
   const [open, setOpen] = useState(false)
   const [modelo, setModelo] = useState("")
   const [ano, setAno] = useState("")
   const [preco, setPreco] = useState("")
-  const [foto, setFoto] = useState("")
   const [marcaId, setMarcaId] = useState("")
+  const [mainImage, setMainImage] = useState<File | null>(null)
+  const [additionalImages, setAdditionalImages] = useState<FileList | null>(null)
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  function handleMainImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    if (e.target.files && e.target.files[0]) {
+      setMainImage(e.target.files[0])
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setMainImagePreview(e.target?.result as string)
+      }
+      reader.readAsDataURL(e.target.files[0])
+    }
+  }
+
+  async function uploadMainImage(celularId: number) {
+    if (!mainImage) return null;
+
+    const formData = new FormData()
+    formData.append('codigoFoto', mainImage)
+    formData.append('descricao', `${modelo} - Main Image`)
+    formData.append('celularId', celularId.toString())
+
+    const response = await fetch('/api/fotos/main', {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to upload main image')
+    }
+
+    return response.json()
+  }
+
+  async function uploadAdditionalImages(celularId: number) {
+    if (!additionalImages) return;
+
+    for (let i = 0; i < additionalImages.length; i++) {
+      const formData = new FormData()
+      formData.append('codigoFoto', additionalImages[i])
+      formData.append('descricao', `${modelo} - Image ${i + 1}`)
+      formData.append('celularId', celularId.toString())
+
+      await fetch('/api/fotos', {
+        method: 'POST',
+        body: formData,
+      })
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/celulares', {
+      // First create the celular
+      const celularResponse = await fetch('/api/celulares', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -30,24 +82,37 @@ export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
           modelo,
           ano: parseInt(ano),
           preco: parseFloat(preco),
-          foto,
           marcaId: parseInt(marcaId)
         })
       })
 
-      if (!response.ok) {
+      if (!celularResponse.ok) {
         throw new Error('Failed to create celular')
+      }
+
+      const celular = await celularResponse.json()
+
+      // Upload main image if exists
+      if (mainImage) {
+        await uploadMainImage(celular.id)
+      }
+
+      // Upload additional images if any
+      if (additionalImages && additionalImages.length > 0) {
+        await uploadAdditionalImages(celular.id)
       }
 
       setModelo("")
       setAno("")
       setPreco("")
-      setFoto("")
       setMarcaId("")
+      setMainImage(null)
+      setMainImagePreview(null)
+      setAdditionalImages(null)
       setOpen(false)
       window.location.reload()
     } catch (error) {
-      console.error('Error creating celular:', error)
+      console.error('Error:', error)
     } finally {
       setIsLoading(false)
     }
@@ -100,7 +165,7 @@ export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
                 disabled={isLoading}
               />
             </div>
-            <div>
+            {/* <div>
               <Label htmlFor="foto">URL da Foto</Label>
               <Input
                 id="foto"
@@ -109,7 +174,7 @@ export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
                 placeholder="Digite a URL da foto"
                 disabled={isLoading}
               />
-            </div>
+            </div> */}
             <div>
               <Label htmlFor="marca">Marca</Label>
               <Select value={marcaId} onValueChange={setMarcaId}>
@@ -124,6 +189,48 @@ export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <Label>Foto Principal</Label>
+              <div className="mt-2 flex items-center gap-4">
+                {mainImagePreview ? (
+                  <Image
+                    src={mainImagePreview}
+                    alt="Preview"
+                    width={100}
+                    height={100}
+                    className="rounded-lg object-cover"
+                  />
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-lg border border-dashed">
+                    <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                  </div>
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleMainImageChange}
+                  disabled={isLoading}
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label>Fotos Adicionais</Label>
+              <div className="mt-2">
+                <Input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={(e) => setAdditionalImages(e.target.files)}
+                  disabled={isLoading}
+                />
+              </div>
+              {additionalImages && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {additionalImages.length} imagens selecionadas
+                </p>
+              )}
             </div>
             <div className="text-end">
               <Button type="submit" disabled={isLoading}>
