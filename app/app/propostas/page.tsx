@@ -4,9 +4,8 @@ import { Celular } from "@/app/api/celulares/route";
 import { AppContainer } from "@/components/app-container";
 import { AppHeader } from "@/components/app-header";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-// import { CreatePropostaDialog } from "./components/create-proposta-dialog";
-// import { EditPropostaDialog } from "./components/edit-proposta-dialog";
 import { DeletePropostaDialog } from "./components/delete-proposta-dialog";
+import { AnswerPropostaDialog } from "./components/answer-proposta-dialog";
 
 export default async function Page() {
   const [propostasRes, clientesRes, celularesRes] = await Promise.all([
@@ -29,11 +28,8 @@ export default async function Page() {
 
   return (
     <main>
-      <AppHeader label="Propostas" path="/propostas" />
+      <AppHeader label="Propostas" path="/app/propostas" />
       <AppContainer>
-        {/* <section className="text-end">
-          <CreatePropostaDialog clientes={clientes} celulares={celulares} />
-        </section> */}
         <section>
           <Table>
             <TableCaption>Lista de Propostas</TableCaption>
@@ -54,7 +50,7 @@ export default async function Page() {
                   <TableCell>{proposta.descricao}</TableCell>
                   <TableCell>{proposta.resposta || "Sem resposta"}</TableCell>
                   <TableCell>
-                    {/* <EditPropostaDialog proposta={proposta} /> */}
+                    <AnswerPropostaDialog proposta={proposta} />
                     <DeletePropostaDialog proposta={proposta} />
                   </TableCell>
                 </TableRow>

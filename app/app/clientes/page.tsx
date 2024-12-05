@@ -15,7 +15,7 @@ export default async function Page() {
 
   return (
     <main>
-      <AppHeader label="Clientes" path="/clientes" />
+      <AppHeader label="Clientes" path="/app/clientes" />
       <AppContainer>
         <section className="text-end">
           {/* <CreateClienteDialog /> */}

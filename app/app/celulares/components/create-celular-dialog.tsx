@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useState } from "react"
 import { Marca } from "@/app/api/marcas/route"
 import Image from "next/image"
-import { ImagePlus, Loader2, Upload } from "lucide-react"
+import { ImagePlus } from "lucide-react"
 
 export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
   const [open, setOpen] = useState(false)
@@ -72,7 +72,6 @@ export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
     setIsLoading(true)
 
     try {
-      // First create the celular
       const celularResponse = await fetch('/api/celulares', {
         method: 'POST',
         headers: {
@@ -82,7 +81,7 @@ export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
           modelo,
           ano: parseInt(ano),
           preco: parseFloat(preco),
-          marcaId: parseInt(marcaId)
+          marcaId: parseInt(marcaId),
         })
       })
 
@@ -92,12 +91,10 @@ export function CreateCelularDialog({ marcas }: { marcas: Marca[] }) {
 
       const celular = await celularResponse.json()
 
-      // Upload main image if exists
       if (mainImage) {
         await uploadMainImage(celular.id)
       }
 
-      // Upload additional images if any
       if (additionalImages && additionalImages.length > 0) {
         await uploadAdditionalImages(celular.id)
       }

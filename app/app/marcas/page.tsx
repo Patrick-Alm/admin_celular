@@ -17,7 +17,7 @@ export default async function Page() {
 
   return (
     <main>
-      <AppHeader label="Marcas" path="/marcas" />
+      <AppHeader label="Marcas" path="/app/marcas" />
       <AppContainer>
         <section className="text-end">
           <CreateMarcaDialog />

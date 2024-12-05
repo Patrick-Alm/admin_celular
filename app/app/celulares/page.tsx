@@ -26,7 +26,7 @@ export default async function Page() {
 
   return (
     <main>
-      <AppHeader label="Celulares" path="/celulares" />
+      <AppHeader label="Celulares" path="/app/celulares" />
       <AppContainer>
         <section className="text-end">
           <CreateCelularDialog marcas={marcas} />

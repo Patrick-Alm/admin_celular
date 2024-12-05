@@ -8,7 +8,6 @@ import { Marca } from "@/app/api/marcas/route"
 import { DashboardCharts } from "./components/dashboard-charts"
 
 export default async function Page() {
-  // Fetch all necessary data
   const [celulares, clientes, propostas, marcas] = await Promise.all([
     fetch(`${process.env.NEXT_PUBLIC_URL_API}/celulares`).then(res => res.json()).catch((err) => {
       console.log('CELULAR ERROR', err)
@@ -28,13 +27,11 @@ export default async function Page() {
     }),
   ]);
 
-  // 1. Phones by brand chart data
   const phonesByBrand = marcas.map((marca: Marca) => ({
     name: marca.nome,
     quantidade: celulares.filter((cel: Celular) => cel.marcaId === marca.id).length
   }));
 
-  // 2. Price range distribution
   const priceRanges = [
     { range: '0-1000', count: 0 },
     { range: '1001-2000', count: 0 },
@@ -63,7 +60,7 @@ export default async function Page() {
 
   return (
     <main>
-      <AppHeader label="Dashboard" path="/dashboard" />
+      <AppHeader label="Dashboard" path="/app/dashboard" />
       <AppContainer>
         <div className="grid gap-4 md:grid-cols-4">
           <Card>

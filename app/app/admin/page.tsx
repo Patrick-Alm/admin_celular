@@ -15,7 +15,7 @@ export default async function Page() {
 
   return (
     <main>
-      <AppHeader label="Administradores" path="/admin" />
+      <AppHeader label="Administradores" path="/app/admin" />
       <AppContainer>
         <section className="text-end">
           <CreateAdminDialog />
